@@ -106,12 +106,45 @@ public String receiveShipment(Shipment shipment) {
         shipment.setStatus(Shipment.ShipmentStatus.DISPATCHED);
         return shipmentRepository.save(shipment);
     }
+    
+    public String deliverShipment(Integer shipmentId, String confirmation) {
+        if (!"Yes".equalsIgnoreCase(confirmation)) {
+            return "Delivery not confirmed. Shipment status remains unchanged.";
+        }
 
+        Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() ->
+            new RuntimeException("Shipment ID not found: " + shipmentId)
+        );
 
+        if (shipment.getStatus() != Shipment.ShipmentStatus.DISPATCHED) {
+            return "Shipment must be dispatched before it can be marked as delivered.";
+        }
 
-    // Track shipment by ID
-    public Optional<Shipment> trackShipment(Integer shipmentId) {
-        return shipmentRepository.findById(shipmentId);
+        shipment.setStatus(Shipment.ShipmentStatus.DELIVERED);
+        shipmentRepository.save(shipment);
+
+        return "Shipment marked as delivered.";
     }
+
+    public Shipment trackShipment(Integer shipmentId) {
+        Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() ->
+            new RuntimeException("Shipment ID not found: " + shipmentId)
+        );
+
+        // Create a new Shipment object with only required fields
+        Shipment filteredShipment = new Shipment();
+        filteredShipment.setShipmentId(shipment.getShipmentId());
+        filteredShipment.setItemId(shipment.getItemId());
+        filteredShipment.setQuantityNeeded(shipment.getQuantityNeeded());
+        filteredShipment.setDestination(shipment.getDestination());
+        filteredShipment.setStatus(shipment.getStatus());
+        filteredShipment.setExpectedDelivery(shipment.getExpectedDelivery());
+
+        return filteredShipment;
+    }
+
+    
+
+
 }
 
