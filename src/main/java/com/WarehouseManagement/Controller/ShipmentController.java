@@ -35,10 +35,19 @@ public class ShipmentController {
         shipmentService.dispatchShipment(shipmentId);
         return "Shipment dispatched successfully.";
     }
+    
+    
+    @PutMapping("/deliver/{shipmentId}/{confirmation}")
+    public String deliverShipment(@PathVariable Integer shipmentId, @PathVariable String confirmation) {
+        return shipmentService.deliverShipment(shipmentId, confirmation);
+    }
+    
 
     @GetMapping("/track/{shipmentId}")
-    public Optional<Shipment> trackShipment(@PathVariable Integer shipmentId) {
-        return shipmentService.trackShipment(shipmentId);
-    }
+    public Shipment trackShipment(@PathVariable Integer shipmentId) {
+    return shipmentService.trackShipment(shipmentId);
+}
+
+    
 }
 
